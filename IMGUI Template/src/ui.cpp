@@ -136,70 +136,74 @@ ui::ui()
 void ui::run() {
     while (!done)
     {
-        MSG msg;
-        while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
-        {
-            ::TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
-            if (msg.message == WM_QUIT)
-                done = true;
-        }
-        if (done)
-            break;
-
-        // Handle lost D3D9 device
-        if (g_DeviceLost)
-        {
-            HRESULT hr = g_pd3dDevice->TestCooperativeLevel();
-            if (hr == D3DERR_DEVICELOST)
-            {
-                ::Sleep(10);
-                continue;
-            }
-            if (hr == D3DERR_DEVICENOTRESET)
-                ResetDevice();
-            g_DeviceLost = false;
-        }
-
-        // Handle window resize (we don't resize directly in the WM_SIZE handler)
-        if (g_ResizeWidth != 0 && g_ResizeHeight != 0)
-        {
-            g_d3dpp.BackBufferWidth = g_ResizeWidth;
-            g_d3dpp.BackBufferHeight = g_ResizeHeight;
-            g_ResizeWidth = g_ResizeHeight = 0;
-            ResetDevice();
-        }
-
-        ImGui_ImplDX9_NewFrame();
-        ImGui_ImplWin32_NewFrame();
-        ImGui::NewFrame();
-        ImGuiIO& io = ImGui::GetIO();
-
-        ImGui::SetNextWindowPos(ImVec2(0, 0));
-        ImGui::SetNextWindowSize(io.DisplaySize);
-        ImGui::SetNextWindowBgAlpha(1.0f);
-
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize |
-            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
-            ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus |
-            ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
-
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::Begin("Hello World", nullptr, window_flags);
-        ImGui::Text("Hello World");
-        ImGui::End();
-        ImGui::PopStyleVar();
-
-        if (g_pd3dDevice->BeginScene() >= 0)
-        {
-            ImGui::Render();
-            ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-            g_pd3dDevice->EndScene();
-        }
-        HRESULT result = g_pd3dDevice->Present(nullptr, nullptr, nullptr, nullptr);
-        if (result == D3DERR_DEVICELOST)
-            g_DeviceLost = true;
+        Render();
     }
+    Destroy();
+
+}
+void ui :: Render() {
+    while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE))
+    {
+        ::TranslateMessage(&msg);
+        ::DispatchMessage(&msg);
+        if (msg.message == WM_QUIT)
+            done = true;
+    }
+    if (done)
+    if (g_DeviceLost)
+    {
+        HRESULT hr = g_pd3dDevice->TestCooperativeLevel();
+        if (hr == D3DERR_DEVICELOST)
+        {
+            ::Sleep(10);
+
+        }
+        if (hr == D3DERR_DEVICENOTRESET)
+            ResetDevice();
+        g_DeviceLost = false;
+    }
+
+    // Handle window resize (we don't resize directly in the WM_SIZE handler)
+    if (g_ResizeWidth != 0 && g_ResizeHeight != 0)
+    {
+        g_d3dpp.BackBufferWidth = g_ResizeWidth;
+        g_d3dpp.BackBufferHeight = g_ResizeHeight;
+        g_ResizeWidth = g_ResizeHeight = 0;
+        ResetDevice();
+    }
+
+    ImGui_ImplDX9_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+    ImGuiIO& io = ImGui::GetIO();
+
+    ImGui::SetNextWindowPos(ImVec2(0, 0));
+    ImGui::SetNextWindowSize(io.DisplaySize);
+    ImGui::SetNextWindowBgAlpha(1.0f);
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
+        ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBringToFrontOnFocus |
+        ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoBackground;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+    ImGui::Begin("Hello World", nullptr, window_flags);
+    ImGui::Text("Hello World");
+    ImGui::End();
+    ImGui::PopStyleVar();
+
+    if (g_pd3dDevice->BeginScene() >= 0)
+    {
+        ImGui::Render();
+        ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+        g_pd3dDevice->EndScene();
+    }
+    HRESULT result = g_pd3dDevice->Present(nullptr, nullptr, nullptr, nullptr);
+    if (result == D3DERR_DEVICELOST)
+        g_DeviceLost = true;
+
+}
+void ui::Destroy() {
 
     ImGui_ImplDX9_Shutdown();
     ImGui_ImplWin32_Shutdown();
@@ -208,5 +212,4 @@ void ui::run() {
     CleanupDeviceD3D();
     ::DestroyWindow(hwnd);
     ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
-
 }

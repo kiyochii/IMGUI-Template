@@ -19,8 +19,6 @@ class ui
 		const int WIDHT = 500;
 		const int HEIGHT = 300;
 		void run();
-		void Render();
-		void Destroy();
 
 
 	private:
@@ -28,7 +26,10 @@ class ui
 		bool CreateDeviceD3D(HWND hWnd);
 		void ResetDevice();
 		void CleanupDeviceD3D();
-		void DestroyHWindow();
+		void Render();
+		void Destroy();
+
+		MSG msg;
 		bool show_demo_window;
 		bool show_another_window;
 		bool done;
