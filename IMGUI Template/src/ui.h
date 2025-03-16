@@ -28,9 +28,6 @@ class ui
 		bool CreateDeviceD3D(HWND hWnd);
 		void ResetDevice();
 		void CleanupDeviceD3D();
-		void CreateHWindow(
-			char *ClassName,
-			char *WindowName);
 		void DestroyHWindow();
 		bool show_demo_window;
 		bool show_another_window;
